@@ -1,0 +1,12 @@
+Django==2.2.1
+gunicorn==19.9.0
+psycopg2==2.8.3 --no-binary psycopg2
+django-suit==0.2.26
+redis==3.3.7
+django-celery-beat==1.5.0
+celery==4.3.0
+pytz
+flower==0.9.3
+djangorestframework==3.10.3
+requests==2.22.0
+# ask for `hipo-django-core`

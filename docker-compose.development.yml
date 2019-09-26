@@ -1,0 +1,83 @@
+version: "3.4"
+
+services:
+  nginx:
+    image: nginx:1.14.0
+    ports:
+      - "8000:80"
+    volumes:
+      - "./conf/nginx_development.conf:/etc/nginx/conf.d/default.conf"
+    restart: unless-stopped
+
+  celery:
+    environment:
+      - DJANGO_SETTINGS_MODULE=huddlebot.settings.development
+    restart: unless-stopped
+    volumes:
+      - ".:/huddlebot"
+
+  beat:
+    environment:
+      - DJANGO_SETTINGS_MODULE=huddlebot.settings.development
+    restart: unless-stopped
+    volumes:
+      - ".:/huddlebot"
+
+  flower:
+    environment:
+      - DJANGO_SETTINGS_MODULE=huddlebot.settings.development
+    restart: unless-stopped
+    volumes:
+      - ".:/huddlebot"
+
+  huddlebot:
+    image: huddlebot
+    build:
+      context: .
+      target: application_development
+    volumes:
+      - ".:/huddlebot"
+      - ".data/root:/root"
+    environment:
+      - DJANGO_SETTINGS_MODULE=huddlebot.settings.development
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - postgres
+      - redis
+    ports:
+        - "3500:3500"
+
+  postgres:
+    image: mdillon/postgis:11
+    environment:
+      - POSTGRES_DB=huddlebot
+      - POSTGRES_USER=huddlebot
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ".data/db:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --quiet || exit 1"]
+      interval: 1m
+      timeout: 30s
+      retries: 10
+      start_period: 40s
+
+    container_name: huddlebot_postgres
+    restart: unless-stopped
+
+  redis:
+    image: redis:4.0.10
+    volumes:
+      - ".data/redis:/data"
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG || exit 1"]
+      interval: 1m
+      timeout: 30s
+      retries: 10
+      start_period: 40s
+    container_name: huddlebot_redis
+    restart: unless-stopped

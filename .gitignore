@@ -16,7 +16,6 @@ eggs/
 .eggs/
 lib/
 lib64/
-parts/
 sdist/
 var/
 wheels/
@@ -48,7 +47,6 @@ coverage.xml
 .pytest_cache/
 
 # Translations
-*.mo
 *.pot
 
 # Django stuff:
@@ -97,8 +95,29 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
-
 # mypy
 .mypy_cache/
+
+docs/site
+*.pyc
+.DS_store
+media
+.idea
+.data/
+data/
+
+/huddlebot/settings/secrets*py
+
+celerybeat.pid
+celerybeat-schedule
+
+# Editors
+.vscode/
+
+# Terraform
+.terraform
+secrets.auto.tfvars
+terraform.tfstate.backup
+*.backup
+
+secrets*.py

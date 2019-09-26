@@ -1,0 +1,65 @@
+version: "3.4"
+
+services:
+  nginx:
+    image: nginx:1.14.0
+    ports:
+      - "80:80"
+    container_name: huddlebot_nginx
+    restart: on-failure
+
+  celery:
+    user: ${CONTAINER_UID}:${CONTAINER_GID}
+    image: huddlebot
+    command: celery -A huddlebot worker --loglevel=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A huddlebot status | grep OK || exit 1"]
+      interval: 1m
+      timeout: 30s
+      retries: 10
+      start_period: 40s
+    container_name: huddlebot_celery
+    restart: on-failure
+    depends_on:
+      - huddlebot
+
+  beat:
+    user: ${CONTAINER_UID}:${CONTAINER_GID}
+    image: huddlebot
+    command: celery -A huddlebot beat --pidfile= --loglevel=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -i '[c]elerybeat' || exit 1"]
+      interval: 1m
+      timeout: 30s
+      retries: 10
+      start_period: 40s
+    container_name: huddlebot_beat
+    restart: on-failure
+    depends_on:
+      - huddlebot
+
+  flower:
+    user: ${CONTAINER_UID}:${CONTAINER_GID}
+    image: huddlebot
+    ports:
+      - "5555:5555"
+    command: celery -A huddlebot flower --basic_auth=hello:huddlebot --loglevel=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u hello:huddlebot -f http://localhost:5555 || exit 1"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 10
+      start_period: 40s
+    container_name: huddlebot_flower
+    restart: on-failure
+    depends_on:
+      - huddlebot
+      - beat
+      - celery
+
+  huddlebot:
+    image: huddlebot
+    build:
+      context: .
+      target: application
+    container_name: huddlebot_app
