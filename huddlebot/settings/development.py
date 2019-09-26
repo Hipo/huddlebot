@@ -1,5 +1,4 @@
 from huddlebot.settings.base import *  # noqa
-from huddlebot.settings import secrets
 
 from urllib import parse
 import redis

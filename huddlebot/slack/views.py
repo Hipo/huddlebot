@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.views import View
 
 from huddlebot.slack.models import SlackWorkspace, SlackChannel
@@ -10,6 +11,7 @@ import slack
 
 
 SLACK_OAUTH_URL = "https://slack.com/api/oauth.access"
+SLACK_OAUTH_SCOPES = "channels:read,chat:write:bot"
 
 
 class SlackOAuthView(View):
@@ -20,7 +22,10 @@ class SlackOAuthView(View):
         auth_code = request.GET.get('code')
         
         if not auth_code:
-            raise SuspiciousOperation
+            return render(request, 'slack/authenticate.html', {
+                'client_id': settings.SLACK_CLIENT_ID,
+                'oauth_scope': SLACK_OAUTH_SCOPES,
+            })
         
         response = requests.get(SLACK_OAUTH_URL, params={
             'client_id': settings.SLACK_CLIENT_ID,
@@ -33,7 +38,10 @@ class SlackOAuthView(View):
         team_id = response.get('team_id')
         
         if not access_token or not team_id:
-            raise PermissionDenied
+            return render(request, 'slack/authenticate.html', {
+                'client_id': settings.SLACK_CLIENT_ID,
+                'oauth_scope': SLACK_OAUTH_SCOPES,
+            })
         
         workspace, created = SlackWorkspace.objects.update_or_create(
             team_id=team_id,
@@ -45,4 +53,4 @@ class SlackOAuthView(View):
         
         workspace.update_channels()
         
-        return HttpResponseRedirect()
+        return render(request, 'slack/success.html')

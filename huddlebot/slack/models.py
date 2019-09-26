@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from operator import itemgetter
+
 import slack
 
 
@@ -15,7 +17,7 @@ class SlackWorkspace(models.Model):
         verbose_name_plural = "Slack Workspaces"
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.team_name}"
     
     def update_channels(self):
         """
