@@ -16,16 +16,14 @@ SLACK_OAUTH_URL = "https://slack.com/api/oauth.access"
 SLACK_OAUTH_SCOPES = "channels:read,chat:write:bot,commands"
 
 SLACK_COMMAND_AUTHENTICATE = 'authenticate'
-SLACK_COMMAND_ADD_EVENT = 'add_event'
-SLACK_COMMAND_REMOVE_EVENT = 'remove_event'
+SLACK_COMMAND_CONFIGURE = 'configure'
 SLACK_COMMAND_UPDATE_CHANNELS = 'update_channels'
 SLACK_COMMAND_SHOW_EVENTS = 'show_events'
 
 ALLOWED_COMMANDS = [
     SLACK_COMMAND_SHOW_EVENTS,
     SLACK_COMMAND_UPDATE_CHANNELS,
-    SLACK_COMMAND_REMOVE_EVENT,
-    SLACK_COMMAND_ADD_EVENT,
+    SLACK_COMMAND_CONFIGURE,
     SLACK_COMMAND_AUTHENTICATE,
 ]
 
@@ -100,12 +98,13 @@ class SlackCommandView(View):
         message = ''
 
         if command == SLACK_COMMAND_AUTHENTICATE:
+            #TODO: Generate Google authentication link and append
             message = 'Follow this link to authenticate your Google Calendar account: '
-        elif command == SLACK_COMMAND_ADD_EVENT:
+        elif command == SLACK_COMMAND_CONFIGURE:
+            #TODO: Generate list of calendars and ask user to select one or more
             pass
         elif command == SLACK_COMMAND_SHOW_EVENTS:
-            pass
-        elif command == SLACK_COMMAND_SHOW_EVENTS:
+            #TODO: Display upcoming events
             pass
         elif command == SLACK_COMMAND_UPDATE_CHANNELS:
             workspace.update_channels()
