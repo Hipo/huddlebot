@@ -9,4 +9,5 @@ pytz
 flower==0.9.3
 djangorestframework==3.10.3
 requests==2.22.0
+slackclient==2.2.0
 # ask for `hipo-django-core`

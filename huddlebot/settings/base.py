@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'hipo_django_core',
 
     'huddlebot.users',
+    'huddlebot.slack',
 ]
 
 MIDDLEWARE = [
