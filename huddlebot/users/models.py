@@ -15,7 +15,7 @@ def generate_string_unique_id():
 class User(PermissionsMixin, AbstractBaseModel, AbstractBaseUser):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     username = models.CharField(default=generate_string_unique_id, unique=True, max_length=255)
 
     is_staff = models.BooleanField(default=False, help_text=_("Only staff users can access Django Admin."))
