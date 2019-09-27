@@ -51,7 +51,48 @@ class SlackChannel(models.Model):
     def __str__(self):
         return f"{self.workspace.team_name} - {self.name}"
     
-    def send_message(self, message):
+    def send_question_message(self, message):
+        """
+        Sends a Yes/No question Slack message to this channel
+        """
+        payload = [
+            {
+    			"type": "section",
+    			"text": {
+    				"type": "mrkdwn",
+    				"text": message,
+    			}
+    		},
+            {
+    			"type": "actions",
+    			"elements": [
+    				{
+    					"type": "button",
+    					"text": {
+    						"type": "plain_text",
+    						"emoji": True,
+    						"text": "Yes"
+    					},
+    					"style": "primary",
+    					"value": "meeting-notes-yes"
+    				},
+    				{
+    					"type": "button",
+    					"text": {
+    						"type": "plain_text",
+    						"emoji": True,
+    						"text": "No"
+    					},
+    					"style": "danger",
+    					"value": "meeting-notes-no"
+    				}
+    			]
+    		}
+        ]
+        
+        self.send_message(message, blocks=payload)
+    
+    def send_message(self, message, blocks=None):
         """
         Sends a Slack message to this channel
         """
@@ -59,7 +100,8 @@ class SlackChannel(models.Model):
 
         response = client.chat_postMessage(
             channel=self.channel_id,
-            text=message
+            text=message,
+            blocks=blocks
         )
 
     def create_file(self, title):

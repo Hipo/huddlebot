@@ -8,6 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from huddlebot.slack.models import SlackWorkspace, SlackChannel
 
+import json
+import pprint
 import requests
 import slack
 
@@ -46,7 +48,7 @@ class SlackOAuthView(View):
             'client_secret': settings.SLACK_CLIENT_SECRET,
             'code': auth_code,
         }).json()
-    
+        pprint.pprint(response)
         access_token = response.get('access_token')
         team_name = response.get('team_name')
         team_id = response.get('team_id')
@@ -95,7 +97,7 @@ class SlackCommandView(View):
                 'text': "Your workspace doesn't seem to be setup, please install Huddlebot first."
             })
 
-        message = ''
+        message = None
 
         if command == SLACK_COMMAND_AUTHENTICATE:
             #TODO: Generate Google authentication link and append
@@ -103,10 +105,34 @@ class SlackCommandView(View):
         elif command == SLACK_COMMAND_CONFIGURE:
             #TODO: Generate list of calendars and ask user to select one or more
             channel = workspace.channels.get(channel_id=channel_id)
-            channel.create_file("Meeting on Friday, Sept 27, 2019")
+            block_message = "Pick the calendars you would like to track"
+            
+            payload = [
+                {
+                    "type": "section",
+                    "block_id": "calendar-picker",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": block_message
+                    },
+                    "accessory": {
+                        "action_id": "pick-calendars",
+                        "type": "multi_external_select",
+                        "min_query_length": 1,
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "Select calendars"
+                        },
+                    }
+                }
+            ]
+            
+            channel.send_message(message, blocks=payload)
         elif command == SLACK_COMMAND_SHOW_EVENTS:
             #TODO: Display upcoming events
-            pass
+            channel = workspace.channels.get(channel_id=channel_id)
+            
+            channel.send_question_message("Would you like to create meeting notes?")
         elif command == SLACK_COMMAND_UPDATE_CHANNELS:
             workspace.update_channels()
             
@@ -118,3 +144,83 @@ class SlackCommandView(View):
             })
         else:
             return HttpResponse(status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SlackInteractiveView(View):
+    """
+    Handles incoming interactive calls from Slack
+    """
+    def post(self, request):
+        payload = json.loads(request.POST.get('payload'))
+        team_id = payload.get('team', {}).get('id')
+        
+        try:
+            workspace = SlackWorkspace.objects.get(team_id=team_id)
+        except:
+            return HttpResponse(status=403)
+        
+        user_id = payload.get('user', {}).get('id')
+        channel_id = payload.get('channel', {}).get('id')
+        actions = payload.get('actions', [])
+        
+        if len(actions) == 0:
+            return HttpResponse(status=403)
+
+        action = actions[0]
+        
+        if action.get("action_id") == "pick-calendars":
+            calendar_ids = []
+            
+            for selected_option in action.get("selected_options", []):
+                calendar_ids.append(selected_option.get("value"))
+            
+            #TODO: Save new calendars list
+            pprint.pprint(calendar_ids)
+        elif action.get("value") == "meeting-notes-yes":
+            channel = workspace.channels.get(channel_id=channel_id)
+
+            #TODO: Find actual meeting and create notes with that title
+            channel.create_file("Meeting on Friday, Sept 27, 2019")
+        
+        return HttpResponse(status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SlackLoadMenuView(View):
+    """
+    Handles incoming interactive calls from Slack
+    """
+    def post(self, request):
+        payload = json.loads(request.POST.get('payload'))
+        pprint.pprint(payload)
+        team_id = payload.get('team', {}).get('id')
+        
+        try:
+            workspace = SlackWorkspace.objects.get(team_id=team_id)
+        except:
+            return HttpResponse(status=403)
+        
+        user_id = payload.get('user', {}).get('id')
+        channel_id = payload.get('channel', {}).get('id')
+
+        #TODO: Get list of calendars and build options
+        
+        return JsonResponse({
+            'options': [
+                {
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Personal"
+                    },
+                    "value": "123456"
+                },
+                {
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Business"
+                    },
+                    "value": "654321"
+                },
+            ],
+        })
