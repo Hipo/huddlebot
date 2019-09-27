@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from huddlebot.calendars.models import Calendar
+from huddlebot.calendars.models import Calendar, Event
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -11,3 +11,6 @@ class CalendarInline(admin.TabularInline):
     show_change_link = True
     can_delete = True
     extra = 0
+
+
+admin.site.register(Event)

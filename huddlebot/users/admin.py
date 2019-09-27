@@ -17,7 +17,7 @@ class UserAdmin(DjangoUserAdmin):
         ("Permissions", {"fields": ("is_staff", "is_superuser")}),
     )
     readonly_fields = ("id", "creation_datetime",)
-    list_display = ("id", "name", "email")
+    list_display = ("id", "name", "slack_workspace", "email")
     list_filter = ("is_staff", "is_superuser",)
     search_fields = ("id", "email", "name")
     form = UserChangeForm
