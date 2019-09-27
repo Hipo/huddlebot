@@ -121,3 +121,4 @@ terraform.tfstate.backup
 *.backup
 
 secrets*.py
+credentials.json
