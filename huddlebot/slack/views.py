@@ -104,7 +104,6 @@ class SlackCommandView(View):
             #TODO: Generate Google authentication link and append
             message = 'Follow this link to authenticate your Google Calendar account: '
         elif command == SLACK_COMMAND_CONFIGURE:
-            #TODO: Generate list of calendars and ask user to select one or more
             channel = workspace.channels.get(channel_id=channel_id)
             block_message = "Pick the calendars you would like to track"
             
