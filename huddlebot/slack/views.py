@@ -48,7 +48,7 @@ class SlackOAuthView(View):
             'client_secret': settings.SLACK_CLIENT_SECRET,
             'code': auth_code,
         }).json()
-        pprint.pprint(response)
+        
         access_token = response.get('access_token')
         team_name = response.get('team_name')
         team_id = response.get('team_id')
@@ -68,6 +68,7 @@ class SlackOAuthView(View):
         )
         
         workspace.update_channels()
+        workspace.update_team_info()
         
         return render(request, 'slack/success.html')
 

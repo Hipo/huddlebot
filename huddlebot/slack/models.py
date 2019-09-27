@@ -11,6 +11,7 @@ class SlackWorkspace(models.Model):
     access_token = models.CharField(max_length=255)
     team_name = models.CharField(max_length=255)
     team_id = models.CharField(max_length=255, unique=True)
+    team_domain = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = "Slack Workspace"
@@ -18,6 +19,17 @@ class SlackWorkspace(models.Model):
 
     def __str__(self):
         return f"{self.team_name}"
+    
+    def update_team_info(self):
+        """
+        Update team information
+        """
+        client = slack.WebClient(token=self.access_token)
+        response = client.team_info()
+        team_domain = response.get("team", {}).get("domain")
+        
+        self.team_domain = team_domain
+        self.save()
     
     def update_channels(self):
         """
