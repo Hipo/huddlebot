@@ -126,7 +126,8 @@ class SlackChannel(models.Model):
         response = client.chat_postMessage(
             channel=self.channel_id,
             text=message,
-            blocks=blocks
+            blocks=blocks,
+            link_names=True
         )
 
     def create_file(self, title):

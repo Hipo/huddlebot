@@ -128,8 +128,8 @@ class Event(AbstractBaseModel):
 
         for channel in channels_to_notify:
             name = self.name if self.name else "Huddle"
-            # message = f"{name} is going to start. {self.get_huddle_link()} https://media.giphy.com/media/3o7TKUM3IgJBX2as9O/giphy.gif"
-            message = f"{name} is going to start. {self.get_huddle_link()}"
+            message = f"@here {name} is going to start. {self.get_huddle_link()} https://media.giphy.com/media/3o7TKUM3IgJBX2as9O/giphy.gif"
+            #message = f"{name} is going to start. {self.get_huddle_link()}"
 
             channel.send_message(message)
             print(f"Notification for {self} is sent to {channel}")
