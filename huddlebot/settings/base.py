@@ -36,8 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'hipo_django_core',
+    'rest_framework',
 
     'huddlebot.users',
+    'huddlebot.calendars',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +58,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates/'),
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -91,6 +93,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+GOOGLE_SCOPES = [
+    'https://www.googleapis.com/auth/calendar.readonly'
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -110,6 +115,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Django Rest Framework
+# https://www.django-rest-framework.org/
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny'
+    ],
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
+    'DATE_FORMAT': '%Y-%m-%d',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
+}
 
 
 # Django Suit
