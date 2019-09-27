@@ -1,5 +1,9 @@
 # Huddlebot
 
+![Huddlebot](https://avatars.slack-edge.com/2019-09-26/775816063767_546325090b7017e74dff_192.png "Huddlebot")
+
+> I manage your huddle meetings.
+
 ## Development
 
 - Install Docker.
