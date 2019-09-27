@@ -50,3 +50,27 @@ class SlackChannel(models.Model):
 
     def __str__(self):
         return f"{self.workspace.team_name} - {self.name}"
+    
+    def send_message(self, message):
+        """
+        Sends a Slack message to this channel
+        """
+        client = slack.WebClient(token=self.workspace.access_token)
+
+        response = client.chat_postMessage(
+            channel=self.channel_id,
+            text=message
+        )
+
+    def create_file(self, title):
+        """
+        Creates empty editable text file in channel
+        """
+        client = slack.WebClient(token=self.workspace.access_token)
+
+        response = client.files_upload(
+            channels=self.channel_id,
+            content=title,
+            filetype="txt",
+            title=title
+        )

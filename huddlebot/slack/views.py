@@ -13,7 +13,7 @@ import slack
 
 
 SLACK_OAUTH_URL = "https://slack.com/api/oauth.access"
-SLACK_OAUTH_SCOPES = "channels:read,chat:write:bot,commands"
+SLACK_OAUTH_SCOPES = "channels:read,chat:write:bot,commands,files:write:user,team:read"
 
 SLACK_COMMAND_AUTHENTICATE = 'authenticate'
 SLACK_COMMAND_CONFIGURE = 'configure'
@@ -102,7 +102,8 @@ class SlackCommandView(View):
             message = 'Follow this link to authenticate your Google Calendar account: '
         elif command == SLACK_COMMAND_CONFIGURE:
             #TODO: Generate list of calendars and ask user to select one or more
-            pass
+            channel = workspace.channels.get(channel_id=channel_id)
+            channel.create_file("Meeting on Friday, Sept 27, 2019")
         elif command == SLACK_COMMAND_SHOW_EVENTS:
             #TODO: Display upcoming events
             pass
@@ -110,7 +111,10 @@ class SlackCommandView(View):
             workspace.update_channels()
             
             message = 'OK, all done! I have updated your channels.'
-        
-        return JsonResponse({
-            'text': message,
-        })
+
+        if message:
+            return JsonResponse({
+                'text': message,
+            })
+        else:
+            return HttpResponse(status=200)
