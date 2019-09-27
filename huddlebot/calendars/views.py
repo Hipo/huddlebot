@@ -1,13 +1,13 @@
 from django.conf import settings
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
 from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
 from huddlebot.users.models import User
 
 
-class CalendarAuthCallbackView(APIView):
+class CalendarOuthCallbackView(APIView):
     permission_classes = ()
 
     def get(self, request, *args, **kwargs):
@@ -37,4 +37,8 @@ class CalendarAuthCallbackView(APIView):
         }
         user.save()
 
-        return Response(status=HTTP_204_NO_CONTENT)
+        return redirect("calendars:auth-callback-success")
+
+
+class CalendarAuthCallbackSuccessView(TemplateView):
+    template_name = "calendars/auth-success.html"

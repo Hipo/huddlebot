@@ -9,9 +9,51 @@
 
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="icon.png">
+  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+
+  <style type="text/css">
+    body {
+      font-family: 'Lato', sans-serif;
+      text-align: center;
+      margin: 0px;
+
+    }
+    header {
+      background-color: #73bff9;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 70px;
+      padding: 50px 0;
+    }
+    p {
+      color: #40484c;
+      font-size: 16px;
+
+    }
+    .code-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+    }
+    code {
+      background-color: rgba(64,72,76,0.6);
+      color: aliceblue;
+      padding: 4px;
+      margin: 0 4px;
+      border-radius: 3px;
+    }
+    #success {
+      font-size: 56px;
+    }
+  </style>
+
 </head>
 
 <body>
+  <header>
+    <img src="https://avatars.slack-edge.com/2019-09-26/775816063767_546325090b7017e74dff_192.png" alt="Huddlebot">
+  </header>
   {% block content %}{% endblock content %}
 </body>
 
