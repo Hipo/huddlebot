@@ -104,6 +104,19 @@ class SlackChannel(models.Model):
         
         self.send_message(message, blocks=payload)
     
+    def send_ephemeral_message(self, user_id, message, blocks=None):
+        """
+        Sends an ephemeral Slack message to the user
+        """
+        client = slack.WebClient(token=self.workspace.access_token)
+
+        response = client.chat_postEphemeral(
+            channel=self.channel_id,
+            user=user_id,
+            text=message,
+            blocks=blocks
+        )
+    
     def send_message(self, message, blocks=None):
         """
         Sends a Slack message to this channel

@@ -135,7 +135,7 @@ class SlackCommandView(View):
                 }
             ]
             
-            channel.send_message(message, blocks=payload)
+            channel.send_ephemeral_message(user_id, message, blocks=payload)
         elif command == SLACK_COMMAND_SHOW_EVENTS:
             #TODO: Display upcoming events
             channel = workspace.channels.get(channel_id=channel_id)
