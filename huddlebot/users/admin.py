@@ -7,7 +7,10 @@ from huddlebot.users.models import User
 
 class UserAdmin(DjangoUserAdmin):
     fieldsets = (
-        ("Credentials", {"fields": ("id", "email", "first_name", "last_name", "password", "creation_datetime")}),
+        ("Credentials", {"fields": (
+            "id", "email", "first_name", "last_name", "password", "creation_datetime",
+            "google_auth_credentials", "google_auth_state_key"
+        )}),
         ("Permissions", {"fields": ("is_staff", "is_superuser")}),
     )
     readonly_fields = ("id", "creation_datetime",)

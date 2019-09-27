@@ -19,7 +19,6 @@ class Calendar(AbstractBaseModel):
     @classmethod
     def get_google_calendar_list_of_user(cls, user):
         service = user.get_google_calendar_service()
-
         response = service.calendarList().list().execute()
         calendar_list = [{"name": item["summary"], "id": item["id"]} for item in response["items"]]
 

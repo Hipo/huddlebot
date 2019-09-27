@@ -99,6 +99,7 @@ AUTH_PASSWORD_VALIDATORS = [
 GOOGLE_SCOPES = [
     'https://www.googleapis.com/auth/calendar.readonly'
 ]
+GOOGLE_SECRET_FILE_PATH = "credentials.json"
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
