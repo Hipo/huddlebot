@@ -1,3 +1,13 @@
 from django.contrib import admin
 
-# Register your models here.
+from huddlebot.calendars.models import Calendar
+from django.utils.translation import ugettext_lazy as _
+
+
+class CalendarInline(admin.TabularInline):
+    verbose_name_plural = _("Calendars")
+    model = Calendar
+    fields = ("name", "google_calendar_id")
+    show_change_link = True
+    can_delete = True
+    extra = 0

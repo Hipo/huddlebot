@@ -6,13 +6,14 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
+from huddlebot.calendars.models import Calendar
 from huddlebot.slack.models import SlackWorkspace, SlackChannel
 
 import json
 import pprint
 import requests
 import slack
-
+from huddlebot.users.models import User
 
 SLACK_OAUTH_URL = "https://slack.com/api/oauth.access"
 SLACK_OAUTH_SCOPES = "channels:read,chat:write:bot,commands,files:write:user,team:read"
@@ -101,8 +102,15 @@ class SlackCommandView(View):
         message = None
 
         if command == SLACK_COMMAND_AUTHENTICATE:
-            #TODO: Generate Google authentication link and append
-            message = 'Follow this link to authenticate your Google Calendar account: '
+            user, _ = User.objects.get_or_create(
+                name=request.POST.get('user_name'),
+                defaults={
+                    'slack_user_id': user_id,
+                    'slack_workspace': workspace,
+                }
+            )
+            url = user.get_google_calendar_auth_url()
+            message = f'Follow this link to authenticate your Google Calendar account: {url}'
         elif command == SLACK_COMMAND_CONFIGURE:
             channel = workspace.channels.get(channel_id=channel_id)
             block_message = "Pick the calendars you would like to track"
@@ -118,7 +126,7 @@ class SlackCommandView(View):
                     "accessory": {
                         "action_id": "pick-calendars",
                         "type": "multi_external_select",
-                        "min_query_length": 1,
+                        "min_query_length": 0,
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Select calendars"
@@ -170,12 +178,28 @@ class SlackInteractiveView(View):
         action = actions[0]
         
         if action.get("action_id") == "pick-calendars":
-            calendar_ids = []
+            selected_options = action.get("selected_options", [])
+
+            calendar_ids = [selected_option["value"] for selected_option in selected_options]
+
+            # Create the calendars of User.
+            user = User.objects.get(slack_user_id=user_id)
+            for selected_option in selected_options:
+                calendar, _ = Calendar.objects.get_or_create(
+                    name=selected_option["text"]["text"],
+                    user=user,
+                    defaults={
+                        'google_calendar_id': selected_option["value"],
+                    }
+                )
+
+            # Delete unchecked calendars
+            Calendar.objects.filter(
+                user=user
+            ).exclude(
+                google_calendar_id__in=calendar_ids
+            ).delete()
             
-            for selected_option in action.get("selected_options", []):
-                calendar_ids.append(selected_option.get("value"))
-            
-            #TODO: Save new calendars list
             pprint.pprint(calendar_ids)
         elif action.get("value") == "meeting-notes-yes":
             channel = workspace.channels.get(channel_id=channel_id)
@@ -204,23 +228,19 @@ class SlackLoadMenuView(View):
         user_id = payload.get('user', {}).get('id')
         channel_id = payload.get('channel', {}).get('id')
 
-        #TODO: Get list of calendars and build options
-        
+        user = User.objects.get(slack_user_id=user_id, slack_workspace_id=workspace.id)
+        calendars_list = Calendar.get_google_calendar_list_of_user(user)
+
+        options = []
+        for calendar_item in calendars_list:
+            options.append({
+                "text": {
+                    "type": "plain_text",
+                    "text": calendar_item["name"]
+                },
+                "value": calendar_item["id"]
+            })
+
         return JsonResponse({
-            'options': [
-                {
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Personal"
-                    },
-                    "value": "123456"
-                },
-                {
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Business"
-                    },
-                    "value": "654321"
-                },
-            ],
+            'options': options,
         })

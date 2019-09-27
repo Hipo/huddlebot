@@ -19,8 +19,7 @@ def generate_string_unique_id():
 
 
 class User(PermissionsMixin, AbstractBaseModel, AbstractBaseUser):
-    first_name = models.CharField(max_length=255, blank=True)
-    last_name = models.CharField(max_length=255, blank=True)
+    name = models.CharField(max_length=255, blank=True)
     email = models.EmailField(blank=True)
     username = models.CharField(default=generate_string_unique_id, unique=True, max_length=255)
 
@@ -29,8 +28,11 @@ class User(PermissionsMixin, AbstractBaseModel, AbstractBaseUser):
     google_auth_credentials = JSONField(blank=True, default=dict)
     google_auth_state_key = models.CharField(max_length=255, blank=True)
 
+    slack_user_id = models.CharField(max_length=255, blank=True)
+    slack_workspace = models.ForeignKey("slack.SlackWorkspace", related_name="users", on_delete=models.CASCADE)
+
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ["first_name", "last_name", "email"]
+    REQUIRED_FIELDS = ["email"]
 
     objects = UserManager()
 
@@ -39,7 +41,7 @@ class User(PermissionsMixin, AbstractBaseModel, AbstractBaseUser):
         verbose_name_plural = _('Users')
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.name}"
 
     def get_google_auth_flow(self):
         if self.google_auth_state_key:

@@ -6,12 +6,13 @@ from hipo_django_core.models import AbstractBaseModel
 
 class Calendar(AbstractBaseModel):
     user = models.ForeignKey("users.User", related_name="calendars", on_delete=models.CASCADE)
-    google_calendar_id = models.CharField(unique=True, max_length=255)
+    google_calendar_id = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = _('Calendar')
         verbose_name_plural = _('Calendars')
+        unique_together = (("user", "google_calendar_id"), )
 
     def __str__(self):
         return f"{self.name}"
