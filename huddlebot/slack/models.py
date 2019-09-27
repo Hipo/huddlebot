@@ -11,6 +11,7 @@ class SlackWorkspace(models.Model):
     access_token = models.CharField(max_length=255)
     team_name = models.CharField(max_length=255)
     team_id = models.CharField(max_length=255, unique=True)
+    team_domain = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = "Slack Workspace"
@@ -18,6 +19,17 @@ class SlackWorkspace(models.Model):
 
     def __str__(self):
         return f"{self.team_name}"
+    
+    def update_team_info(self):
+        """
+        Update team information
+        """
+        client = slack.WebClient(token=self.access_token)
+        response = client.team_info()
+        team_domain = response.get("team", {}).get("domain")
+        
+        self.team_domain = team_domain
+        self.save()
     
     def update_channels(self):
         """
@@ -50,3 +62,69 @@ class SlackChannel(models.Model):
 
     def __str__(self):
         return f"{self.workspace.team_name} - {self.name}"
+    
+    def send_question_message(self, message):
+        """
+        Sends a Yes/No question Slack message to this channel
+        """
+        payload = [
+            {
+    			"type": "section",
+    			"text": {
+    				"type": "mrkdwn",
+    				"text": message,
+    			}
+    		},
+            {
+    			"type": "actions",
+    			"elements": [
+    				{
+    					"type": "button",
+    					"text": {
+    						"type": "plain_text",
+    						"emoji": True,
+    						"text": "Yes"
+    					},
+    					"style": "primary",
+    					"value": "meeting-notes-yes"
+    				},
+    				{
+    					"type": "button",
+    					"text": {
+    						"type": "plain_text",
+    						"emoji": True,
+    						"text": "No"
+    					},
+    					"style": "danger",
+    					"value": "meeting-notes-no"
+    				}
+    			]
+    		}
+        ]
+        
+        self.send_message(message, blocks=payload)
+    
+    def send_message(self, message, blocks=None):
+        """
+        Sends a Slack message to this channel
+        """
+        client = slack.WebClient(token=self.workspace.access_token)
+
+        response = client.chat_postMessage(
+            channel=self.channel_id,
+            text=message,
+            blocks=blocks
+        )
+
+    def create_file(self, title):
+        """
+        Creates empty editable text file in channel
+        """
+        client = slack.WebClient(token=self.workspace.access_token)
+
+        response = client.files_upload(
+            channels=self.channel_id,
+            content=title,
+            filetype="txt",
+            title=title
+        )
