@@ -144,12 +144,6 @@ SUIT_CONFIG = {
     'ADMIN_NAME': 'Huddlebot Control Panel',
 }
 
-# Celery & Celerybeat
-#
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-
+# Slack Integration
 SLACK_CLIENT_ID = secrets.SLACK_CLIENT_ID
 SLACK_CLIENT_SECRET = secrets.SLACK_CLIENT_SECRET

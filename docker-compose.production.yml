@@ -1,0 +1,22 @@
+version: "3.4"
+
+services:
+
+  huddlebot:
+    user: ${CONTAINER_UID}:${CONTAINER_GID}
+    environment:
+      - DJANGO_SETTINGS_MODULE=huddlebot.settings.production
+    command: gunicorn --config /huddlebot/conf/gunicorn.conf.py huddlebot.wsgi
+
+  slack_notificator:
+    user: ${CONTAINER_UID}:${CONTAINER_GID}
+    environment:
+    - DJANGO_SETTINGS_MODULE=huddlebot.settings.production
+    command: gunicorn --config /huddlebot/conf/gunicorn.conf.py huddlebot.wsgi
+
+  rapid7:
+    image: rapid7/r7insight_docker
+    command: '-t 00efbb6f-2b99-4e6d-aad6-6fce9e5f81d2 --no-stats --no-dockerEvents -r eu -j'
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    restart: unless-stopped
