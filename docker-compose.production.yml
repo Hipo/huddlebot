@@ -8,11 +8,11 @@ services:
       - DJANGO_SETTINGS_MODULE=huddlebot.settings.production
     command: gunicorn --config /huddlebot/conf/gunicorn.conf.py huddlebot.wsgi
 
-  slack_notificator:
+  notification_sender:
     user: ${CONTAINER_UID}:${CONTAINER_GID}
     environment:
     - DJANGO_SETTINGS_MODULE=huddlebot.settings.production
-    command: gunicorn --config /huddlebot/conf/gunicorn.conf.py huddlebot.wsgi
+    command: python manage.py send_notifications
 
   rapid7:
     image: rapid7/r7insight_docker

@@ -1,18 +1,16 @@
 from django.conf import settings
-from django.core.exceptions import SuspiciousOperation, PermissionDenied
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from huddlebot.calendars.models import Calendar
-from huddlebot.slack.models import SlackWorkspace, SlackChannel
+from huddlebot.slack.models import SlackWorkspace
 
 import json
 import pprint
 import requests
-import slack
 from huddlebot.users.models import User
 
 SLACK_OAUTH_URL = "https://slack.com/api/oauth.access"
