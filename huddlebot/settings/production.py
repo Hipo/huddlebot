@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 SECRET_KEY = secrets.SECRET_KEY
 
-DEBUG = True
+DEBUG = False
 
 SERVER_URL = "http://huddlebot.hack.hipolabs.com"
 
@@ -27,6 +27,6 @@ DATABASES = {
 }
 
 sentry_sdk.init(
-    dsn="https://d78cf64c6132428891dcc767d7651ced@sentry.io/1765028",
+    dsn=secrets.SENTRY_DSN,
     integrations=[DjangoIntegration()]
 )
